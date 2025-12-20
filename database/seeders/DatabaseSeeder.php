@@ -1,0 +1,23 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Pemilihan;
+use App\Models\Kandidat;
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        User::create([
+            'nama' => 'Admin E-voting',
+            'nis' => 'admin',
+            'kelas' => null,
+            'password' => Hash::make('Voting2025'),
+            'role' => 'admin',
+        ]);
+    }
+}
