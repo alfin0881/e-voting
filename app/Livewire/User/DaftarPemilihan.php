@@ -4,6 +4,9 @@ namespace App\Livewire\User;
 
 use Livewire\Component;
 use App\Models\Pemilihan;
+use Livewire\Attributes\Layout;
+
+#[Layout('layouts.user')]
 
 class DaftarPemilihan extends Component
 {
@@ -20,7 +23,6 @@ class DaftarPemilihan extends Component
 
     public function render()
     {
-        return view('livewire.user.daftar-pemilihan')
-            ->layout('layouts.user');
+        return view('livewire.user.daftar-pemilihan');
     }
 }

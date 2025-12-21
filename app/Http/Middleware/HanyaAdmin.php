@@ -11,11 +11,11 @@ class HanyaAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->adalahAdmin()) {
-    return redirect()->route('masuk')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
-    }
-
+        if (! $request->user()->adalahAdmin()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
 
         return $next($request);
     }
 }
+

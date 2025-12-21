@@ -3,8 +3,12 @@
 namespace App\Livewire\User;
 
 use Livewire\Component;
-use App\Models\Pemilihan;
 use App\Models\Kandidat;
+use App\Models\Pemilihan;
+use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Auth;
+
+#[Layout('layouts.user')]
 
 class LihatKandidat extends Component
 {
@@ -19,13 +23,13 @@ class LihatKandidat extends Component
         $this->pemilihan = Pemilihan::findOrFail($pemilihanId);
         
         // Cek apakah user mengikuti pemilihan ini
-        if (!auth()->user()->pemilihanDiikuti->contains($this->pemilihan->id)) {
+        if (!Auth::user()->pemilihanDiikuti->contains($this->pemilihan->id)) {
             return redirect()->route('user.daftar-pemilihan')
                 ->with('error', 'Anda tidak terdaftar dalam pemilihan ini.');
         }
 
         $this->kandidatList = Kandidat::where('pemilihan_id', $pemilihanId)->get();
-        $this->sudahMemilih = auth()->user()->sudahMemilih($pemilihanId);
+        $this->sudahMemilih = Auth::user()->sudahMemilih($pemilihanId);
     }
 
     public function bukaKonfirmasi($kandidatId)
@@ -46,7 +50,7 @@ class LihatKandidat extends Component
             return;
         }
 
-        auth()->user()->suara()->create([
+        Auth::user()->suara()->create([
             'pemilihan_id' => $this->pemilihan->id,
             'kandidat_id' => $this->kandidatDipilih->id,
             'waktu_memilih' => now(),
@@ -57,7 +61,6 @@ class LihatKandidat extends Component
 
     public function render()
     {
-        return view('livewire.user.lihat-kandidat')
-            ->layout('layouts.user');
+        return view('livewire.user.lihat-kandidat');
     }
 }

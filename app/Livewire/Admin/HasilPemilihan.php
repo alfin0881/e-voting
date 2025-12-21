@@ -30,33 +30,33 @@ class HasilPemilihan extends Component
     }
 
     public function muatHasil($pemilihanId)
-{
-    $pemilihan = Pemilihan::findOrFail($pemilihanId);
-    
-    $kandidatList = Kandidat::where('pemilihan_id', $pemilihanId)
-        ->withCount('suara')
-        ->orderBy('suara_count', 'desc')
-        ->get()
-        ->map(function ($k) {
-            return [
-                'nama_kandidat' => $k->nama_kandidat,
-                'nomor_urut'    => $k->nomor_urut,
-                'suara_count'   => $k->suara_count,
-                'persentase'    => $k->persentaseSuara(),
-            ];
-        })
-        ->toArray();
+    {
+        $pemilihan = Pemilihan::findOrFail($pemilihanId);
+        
+        $kandidatList = Kandidat::where('pemilihan_id', $pemilihanId)
+            ->withCount('suara')
+            ->orderBy('suara_count', 'desc')
+            ->get()
+            ->map(function ($k) {
+                return [
+                    'nama_kandidat' => $k->nama_kandidat,
+                    'nomor_urut'    => $k->nomor_urut,
+                    'suara_count'   => $k->suara_count,
+                    'persentase'    => $k->persentaseSuara(),
+                ];
+            })
+            ->toArray();
 
-    $this->hasilData = [
-        'pemilihan'    => [
-            'nama_pemilihan'  => $pemilihan->nama_pemilihan,
-            'tanggal_mulai'   => $pemilihan->tanggal_mulai,
-            'tanggal_selesai' => $pemilihan->tanggal_selesai,
-        ],
-        'kandidat'     => $kandidatList,
-        'total_suara'  => $pemilihan->totalSuara(),
-    ];
-}
+        $this->hasilData = [
+            'pemilihan'    => [
+                'nama_pemilihan'  => $pemilihan->nama_pemilihan,
+                'tanggal_mulai'   => $pemilihan->tanggal_mulai,
+                'tanggal_selesai' => $pemilihan->tanggal_selesai,
+            ],
+            'kandidat'     => $kandidatList,
+            'total_suara'  => $pemilihan->totalSuara(),
+        ];
+    }
 
 
     public function render()

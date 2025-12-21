@@ -65,7 +65,7 @@
                 <span class="sidebar-text">Hasil Pemilihan</span>
             </a>
 
-            <form method="POST" action="{{ route('keluar') }}" class="mt-8">
+            <form method="POST" action="{{ route('logout') }}" class="mt-8">
                 @csrf
                 <button type="submit"
                     class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl

@@ -34,7 +34,7 @@
                         <p class="text-xs text-gray-500">{{ auth()->user()->nis }}</p>
                     </div>
                     <i class="fa-solid fa-user-circle text-3xl text-gray-700"></i>
-                    <form method="POST" action="{{ route('keluar') }}">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" 
                                 class="px-4 py-2 bg-gradient-to-r from-red-500 to-rose-700 text-white rounded-xl hover:shadow-lg transition duration-300 hover:scale-105 text-sm font-medium">

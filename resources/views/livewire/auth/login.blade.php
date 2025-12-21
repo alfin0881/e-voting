@@ -15,7 +15,7 @@
 
         <!-- Login Card -->
         <div class="bg-white rounded-2xl shadow-2xl p-8 animate-scale-up">
-            <form wire:submit="masuk" class="space-y-6">
+            <form wire:submit="login" class="space-y-6">
                 <!-- NIS Input -->
                 <div>
                     <label for="nis" class="block text-sm font-semibold text-gray-700 mb-2">

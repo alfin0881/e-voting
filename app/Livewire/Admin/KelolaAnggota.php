@@ -3,38 +3,31 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\User;
 use App\Models\Pemilihan;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\AnggotaImport;
+use App\Exports\TemplateAnggotaExport;
 use Livewire\Attributes\Layout;
-use Illuminate\Support\Str;
-use Livewire\Attributes\Url;
+use Maatwebsite\Excel\Facades\Excel;
 
 #[Layout('layouts.admin')]
-
 class KelolaAnggota extends Component
 {
-    // ... properti yang sudah ada ...
+    use WithFileUploads;
+
+    // Data
     public $anggotaList;
     public $pemilihanList;
+    
+    // Modal states
     public $modalTambah = false;
     public $modalEdit = false;
     public $modalPeserta = false;
+    public $modalImport = false;
     
-    // Properti filter
-    #[Url] 
-    public $filterKelas = '';
-    #[Url]
-    public $filterNis = '';
-    #[Url]
-    public $filterNama = '';
-
-    // Properti Sortir BARU
-    #[Url]
-    public $sortField = 'nama'; // Default sorting field
-    #[Url]
-    public $sortDirection = 'asc'; // Default sorting direction
-    
+    // Form fields
     public $userId;
     public $nama;
     public $nis;
@@ -42,8 +35,9 @@ class KelolaAnggota extends Component
     public $password;
     public $userDipilih;
     public $pemilihanTerpilih = [];
-
-    // ... (protected $rules dan $messages tidak berubah) ...
+    
+    // Import
+    public $fileImport;
 
     protected $rules = [
         'nama' => 'required|min:3',
@@ -67,79 +61,12 @@ class KelolaAnggota extends Component
         $this->muatData();
     }
 
-    // MEMPERBARUI LOGIKA muatData() UNTUK MENAMBAHKAN SORTING
     public function muatData()
     {
-        $query = User::where('role', 'user')
-            ->with('pemilihanDiikuti');
-
-        // Filter
-        if ($this->filterKelas) {
-            $query->where('kelas', $this->filterKelas);
-        }
-        if ($this->filterNis) {
-            $query->where('nis', 'like', '%' . $this->filterNis . '%');
-        }
-        if ($this->filterNama) {
-            $query->where('nama', 'like', '%' . $this->filterNama . '%');
-        }
-
-        // Sorting
-        $query->orderBy($this->sortField, $this->sortDirection);
-
-        $this->anggotaList = $query->get();
+        $this->anggotaList = User::where('role', 'user')->latest()->get();
     }
 
-    // METHOD BARU UNTUK SORTING
-    public function sortBy($field)
-    {
-        // Jika field yang sama diklik, balikkan arahnya (asc/desc)
-        if ($field === $this->sortField) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            // Jika field berbeda diklik, ganti field dan set arah ke 'asc'
-            $this->sortField = $field;
-            $this->sortDirection = 'asc';
-        }
-        $this->muatData();
-    }
-
-    // ... (getKelasListProperty, hapusSemuaFilter, hapusFilterKelas, dll. tidak berubah) ...
-
-    public function getKelasListProperty()
-    {
-        return User::where('role', 'user')
-            ->whereNotNull('kelas')
-            ->distinct()
-            ->pluck('kelas')
-            ->sort()
-            ->values()
-            ->toArray();
-    }
-
-    public function hapusSemuaFilter()
-    {
-        $this->reset(['filterKelas', 'filterNis', 'filterNama']);
-        $this->muatData();
-    }
-
-    public function hapusFilterKelas()
-    {
-        $this->filterKelas = '';
-        $this->muatData();
-    }
-
-    public function hapusFilterNis()
-    {
-        $this->filterNis = '';
-        $this->muatData();
-    }
-
-    public function hapusFilterNama()
-    {
-        $this->filterNama = '';
-        $this->muatData();
-    }
+    // ==================== CRUD METHODS ====================
 
     public function bukaTambah()
     {
@@ -155,7 +82,7 @@ class KelolaAnggota extends Component
             'nama' => $this->nama,
             'nis' => $this->nis,
             'kelas' => $this->kelas,
-            'password' => Hash::make($this->password),
+            'password' => ($this->password),
             'role' => 'user',
         ]);
 
@@ -172,24 +99,18 @@ class KelolaAnggota extends Component
         $this->nama = $user->nama;
         $this->nis = $user->nis;
         $this->kelas = $user->kelas;
-        $this->password = '';
+        $this->password = ''; // Reset password field
         
         $this->modalEdit = true;
     }
 
     public function perbarui()
     {
-        $rulesEdit = [
+        $this->validate([
             'nama' => 'required|min:3',
             'nis' => 'required|unique:users,nis,' . $this->userId,
             'kelas' => 'nullable',
-        ];
-
-        if ($this->password) {
-             $rulesEdit['password'] = 'min:6';
-        }
-        
-        $this->validate($rulesEdit);
+        ]);
 
         $user = User::findOrFail($this->userId);
 
@@ -199,8 +120,9 @@ class KelolaAnggota extends Component
             'kelas' => $this->kelas,
         ];
 
+        // Update password hanya jika diisi
         if ($this->password) {
-            $data['password'] = Hash::make($this->password);
+            $data['password'] = ($this->password);
         }
 
         $user->update($data);
@@ -218,6 +140,8 @@ class KelolaAnggota extends Component
         $this->dispatch('notifikasi', pesan: 'Anggota berhasil dihapus!', tipe: 'success');
     }
 
+    // ==================== PESERTA PEMILIHAN ====================
+
     public function bukaPeserta($id)
     {
         $this->userDipilih = User::findOrFail($id);
@@ -234,51 +158,84 @@ class KelolaAnggota extends Component
         $this->dispatch('notifikasi', pesan: 'Peserta pemilihan berhasil diperbarui!', tipe: 'success');
     }
 
-    // Watcher untuk semua filter/sort (agar muatData dipanggil)
-    public function updated($property)
+    // ==================== IMPORT EXCEL ====================
+
+    public function bukaImport()
     {
-        // Panggil muatData jika properti yang diubah adalah filter
-        if (Str::startsWith($property, 'filter')) {
+        $this->reset(['fileImport']);
+        $this->modalImport = true;
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new TemplateAnggotaExport(), 'template-import-anggota.xlsx');
+    }
+
+    public function prosesImport()
+    {
+        // Validasi file upload
+        $this->validate([
+            'fileImport' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ], [
+            'fileImport.required' => 'File Excel wajib dipilih',
+            'fileImport.mimes' => 'File harus berformat Excel (xlsx, xls, csv)',
+            'fileImport.max' => 'Ukuran file maksimal 2MB',
+        ]);
+
+        try {
+            // Proses import
+            $import = new AnggotaImport();
+            Excel::import($import, $this->fileImport->getRealPath());
+
+            // Dapatkan hasil import
+            $sukses = $import->getSukses();
+            $gagal = $import->getGagal();
+
+            // Reset state
+            $this->modalImport = false;
+            $this->reset(['fileImport']);
             $this->muatData();
+            
+            // Notifikasi berdasarkan hasil
+            if ($gagal > 0) {
+                $this->dispatch('notifikasi', 
+                    pesan: "Import selesai! Berhasil: {$sukses}, Gagal: {$gagal} (NIS duplikat atau data tidak valid)", 
+                    tipe: 'warning'
+                );
+            } else {
+                $this->dispatch('notifikasi', 
+                    pesan: "Import berhasil! {$sukses} anggota berhasil ditambahkan.", 
+                    tipe: 'success'
+                );
+            }
+            
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            // Error validasi Excel
+            $failures = $e->failures();
+            $errorRows = [];
+            
+            foreach ($failures as $failure) {
+                $errorRows[] = $failure->row();
+            }
+            
+            $this->dispatch('notifikasi', 
+                pesan: 'Gagal import pada baris: ' . implode(', ', array_unique($errorRows)), 
+                tipe: 'error'
+            );
+            
+        } catch (\Exception $e) {
+            // Error umum
+            $this->dispatch('notifikasi', 
+                pesan: 'Gagal import: ' . $e->getMessage(), 
+                tipe: 'error'
+            );
         }
     }
 
-    public function getStatusFilterProperty()
-    {
-        $filters = [];
-        
-        if ($this->filterKelas) {
-            $filters[] = [
-                'name' => 'Kelas', 
-                'value' => $this->filterKelas,
-                'method' => 'hapusFilterKelas'
-            ];
-        }
-        
-        if ($this->filterNis) {
-            $filters[] = [
-                'name' => 'NIS', 
-                'value' => $this->filterNis,
-                'method' => 'hapusFilterNis'
-            ];
-        }
-        
-        if ($this->filterNama) {
-            $filters[] = [
-                'name' => 'Nama', 
-                'value' => $this->filterNama,
-                'method' => 'hapusFilterNama'
-            ];
-        }
-        
-        return $filters;
-    }
+    // ==================== RENDER ====================
 
     public function render()
     {
-        return view('livewire.admin.kelola-anggota', [
-            'kelasList' => $this->kelasList,
-            'activeFilters' => $this->getStatusFilterProperty(),
-        ]);
+        return view('livewire.admin.kelola-anggota');
     }
 }

@@ -91,15 +91,6 @@
                                     </svg>
                                     <span>{{ $pemilihan->kandidat->count() }} Kandidat</span>
                                 </div>
-
-                                @if(!$sudahMemilih)
-                                    <div class="flex items-center gap-2 text-sm text-gray-600">
-                                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                        <span class="font-semibold text-indigo-600">{{ $pemilihan->totalSuara() }} suara masuk</span>
-                                    </div>
-                                @endif
                             </div>
 
                             <!-- Button -->
