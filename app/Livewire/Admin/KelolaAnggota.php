@@ -20,6 +20,13 @@ class KelolaAnggota extends Component
     // Data
     public $anggotaList;
     public $pemilihanList;
+    public $listKelas; // Tambahan untuk dropdown filter
+    
+    // Fitur Search, Filter, & Sort
+    public $search = '';
+    public $filterKelas = '';
+    public $sortField = 'nama';
+    public $sortDirection = 'asc';
     
     // Modal states
     public $modalTambah = false;
@@ -63,8 +70,49 @@ class KelolaAnggota extends Component
 
     public function muatData()
     {
-        $this->anggotaList = User::where('role', 'user')->latest()->get();
+        // 1. Ambil daftar kelas yang UNIK dari database untuk dropdown filter
+        $this->listKelas = User::where('role', 'user')
+            ->whereNotNull('kelas')
+            ->where('kelas', '!=', '') // Menghindari string kosong
+            ->distinct()
+            ->pluck('kelas')
+            ->sort();
+
+        // 2. Query untuk tabel anggota
+        $query = User::where('role', 'user');
+
+        // Logika Search
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('nama', 'like', '%' . $this->search . '%')
+                  ->orWhere('nis', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Logika Filter Kelas
+        if ($this->filterKelas) {
+            $query->where('kelas', $this->filterKelas);
+        }
+
+        // Logika Sort
+        $this->anggotaList = $query->orderBy($this->sortField, $this->sortDirection)->get();
     }
+
+    // Method untuk menangani perubahan sorting
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->muatData();
+    }
+
+    // Lifecycle hook agar search & filter langsung merespon perubahan
+    public function updatedSearch() { $this->muatData(); }
+    public function updatedFilterKelas() { $this->muatData(); }
 
     // ==================== CRUD METHODS ====================
 

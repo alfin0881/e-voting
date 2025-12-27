@@ -1,12 +1,10 @@
 <div class="space-y-6">
-    <!-- Header dengan 2 Tombol -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">Kelola Anggota</h1>
             <p class="text-gray-600 mt-1">Atur dan kelola anggota pemilih</p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <!-- Tombol Import Excel -->
             <button wire:click="bukaImport" 
                     class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-xl transition duration-300 hover:scale-105 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,7 +13,6 @@
                 Import Excel
             </button>
             
-            <!-- Tombol Tambah Anggota -->
             <button wire:click="bukaTambah" 
                     class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-semibold hover:shadow-xl transition duration-300 hover:scale-105 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,16 +23,51 @@
         </div>
     </div>
 
-    <!-- Tabel Anggota -->
+    <div class="flex flex-col md:flex-row gap-4">
+        <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+            <input wire:model.live="search" type="text" 
+                   class="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-150 sm:text-sm" 
+                   placeholder="Cari Nama atau NIS anggota...">
+        </div>
+
+        <div class="w-full md:w-64">
+            <select wire:model.live="filterKelas" 
+                    class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl leading-5 bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-150 sm:text-sm">
+                <option value="">Semua Kelas</option>
+                @foreach($listKelas as $k)
+                    <option value="{{ $k }}">{{ $k }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white">
                     <tr>
                         <th class="px-6 py-4 text-left text-sm font-semibold">No</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold">NIS</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold">Nama</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
+                        <th wire:click="sortBy('nis')" class="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-white/10 transition flex items-center gap-1">
+                            NIS
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                        </th>
+                        <th wire:click="sortBy('nama')" class="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-white/10 transition items-center gap-1">
+                            <div class="flex items-center gap-1">
+                                Nama
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                            </div>
+                        </th>
+                        <th wire:click="sortBy('kelas')" class="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-white/10 transition items-center gap-1">
+                            <div class="flex items-center gap-1">
+                                Kelas
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                            </div>
+                        </th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Pemilihan Diikuti</th>
                         <th class="px-6 py-4 text-center text-sm font-semibold">Aksi</th>
                     </tr>
@@ -70,7 +102,6 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
-                                    <!-- Tombol Atur Pemilihan -->
                                     <button wire:click="bukaPeserta({{ $anggota->id }})"
                                             class="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition duration-200"
                                             title="Atur Pemilihan">
@@ -79,7 +110,6 @@
                                         </svg>
                                     </button>
                                     
-                                    <!-- Tombol Edit -->
                                     <button wire:click="bukaEdit({{ $anggota->id }})"
                                             class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition duration-200"
                                             title="Edit">
@@ -88,7 +118,6 @@
                                         </svg>
                                     </button>
                                     
-                                    <!-- Tombol Hapus -->
                                     <button wire:click="hapus({{ $anggota->id }})"
                                             wire:confirm="Apakah Anda yakin ingin menghapus anggota ini?"
                                             class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition duration-200"
@@ -119,7 +148,7 @@
             </table>
         </div>
     </div>
-
+    
     <!-- ========== MODAL TAMBAH ANGGOTA ========== -->
     @if($modalTambah)
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
