@@ -56,7 +56,7 @@
             <a href="{{ route('admin.anggota') }}"
                class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/10">
                 <i data-feather="user-check"></i>
-                <span class="sidebar-text">Kelola Siswa</span>
+                <span class="sidebar-text">Kelola Pemilih</span>
             </a>
 
             <a href="{{ route('admin.hasil') }}"

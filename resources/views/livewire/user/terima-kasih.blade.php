@@ -12,7 +12,7 @@
         <!-- Message -->
         <div class="bg-white rounded-3xl shadow-2xl p-12 mb-8">
             <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
-                Terima Kasih! 🎉
+                Terima Kasih!
             </h1>
             <p class="text-xl text-gray-600 mb-6">
                 Suara Anda telah berhasil tercatat.

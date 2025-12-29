@@ -14,6 +14,9 @@ use App\Livewire\User\DaftarPemilihan;
 use App\Livewire\User\LihatKandidat;
 use App\Livewire\User\TerimaKasih;
 
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Redirect Root
@@ -54,6 +57,8 @@ use App\Livewire\User\TerimaKasih;
             Route::get('/anggota', KelolaAnggota::class)->name('anggota');
             Route::get('/hasil', HasilPemilihan::class)->name('hasil');
         });
+
+        
 
     /*
     |--------------------------------------------------------------------------
