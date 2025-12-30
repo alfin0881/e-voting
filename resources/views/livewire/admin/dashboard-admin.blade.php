@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6 font-dashboard">
     {{-- Header --}}
     <div class="space-y-2">
         <h1 class="text-3xl font-bold text-gray-800">
@@ -9,7 +9,7 @@
         </p>
     </div>
 
-    {{-- Statistik Utama (Layout Warna Gradient Asli) --}}
+    {{-- Statistik Utama --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 transition-all hover:scale-[1.02]">
             <p class="text-indigo-100 text-[10px] font-black uppercase tracking-widest">Total Pemilihan</p>
@@ -137,14 +137,13 @@
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Suara Terkumpul</p>
                                 <p class="text-2xl font-black text-indigo-600 leading-none">{{ number_format($pemilihan->totalSuara()) }}</p>
                             </div>
-                           
                         </div>
                     </div>
                 @endforeach
             </div>
         @else
             <div class="flex flex-col items-center justify-center py-16 bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200">
-                <p class="text-slate-400 font-bold tracking-tight">Tidak ada pemilihan yang aktif hari ini.</p>
+                <p class="text-slate-400 font-bold tracking-tight">Tidak ada pemilihan yang aktif saat ini.</p>
             </div>
         @endif
     </div>

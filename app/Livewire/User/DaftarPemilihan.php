@@ -5,6 +5,7 @@ namespace App\Livewire\User;
 use Livewire\Component;
 use App\Models\Pemilihan;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.user')]
 
@@ -15,7 +16,7 @@ class DaftarPemilihan extends Component
     public function mount()
     {
         // Hanya tampilkan pemilihan yang aktif dan user ikuti
-        $this->pemilihanList = auth()->user()
+        $this->pemilihanList = Auth::user()
             ->pemilihanDiikuti()
             ->where('status', 'aktif')
             ->get();

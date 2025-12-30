@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Admin E-voting',
             'nis' => 'admin',
             'kelas' => null,
-            'password' => Hash::make('Voting2025'),
+            'password' => Hash::make('123'),
             'role' => 'admin',
         ]);
     }
