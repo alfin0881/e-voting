@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: evoting_smk_app #nama container untuk aplikasi
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "2000:80" #disesuaikan dengan port .env laravel #untuk mengakses aplikasi
+    depends_on:
+      - mysql
+      - phpmyadmin
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8.0
+    container_name: evoting_smk_mysql #nama container untuk database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: votes # sesuaikan dengan nama database Anda
+      MYSQL_USER: evoting # sesuaikan dengan user database Anda
+      MYSQL_PASSWORD: Vote26 # sesuaikan dengan password database Anda
+    ports:
+      - "3307:3306" #disesuaikan dengan port .env laravel
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: evoting_smk_phpmyadmin #nama container untuk phpmyadmin
+    restart: always
+    ports:
+      - "8001:80" #disesuaikan agar tidak tabrakan dengan port lain
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306 #disesuaikan dengan port .env laravel
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
+networks:
+  laravel:
+
+volumes:
+  mysql_data:
+
+  
