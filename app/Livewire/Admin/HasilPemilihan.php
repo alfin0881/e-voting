@@ -5,59 +5,61 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use App\Models\Pemilihan;
 use App\Models\Kandidat;
+use App\Models\Suara;
 use Livewire\Attributes\Layout;
 
 #[Layout('layouts.admin')]
 class HasilPemilihan extends Component
 {
     public $allHasilData = [];
-    public int $refreshInterval = 1; // menit
+    public int $lastSuaraCount = 0;
 
     public function mount()
     {
         $this->reloadData();
+        $this->lastSuaraCount = Suara::count();
     }
 
-    // ⚠️ JANGAN pakai #[On] di sini
+    // polling ringan
+    public function checkUpdate()
+    {
+        if (Suara::count() > $this->lastSuaraCount) {
+            // sengaja kosong → UI tetap diam
+        }
+    }
+
+    // refresh data
     public function reloadData()
     {
         $data = [];
-        $pemilihanList = Pemilihan::latest()->get();
 
-        foreach ($pemilihanList as $pemilihan) {
-            $data[] = $this->hitungStatistik($pemilihan);
+        foreach (Pemilihan::latest()->get() as $pemilihan) {
+            $total = Suara::where('pemilihan_id', $pemilihan->id)->count();
+
+            $data[] = [
+                'pemilihan' => ['nama_pemilihan' => $pemilihan->nama_pemilihan],
+                'kandidat' => Kandidat::where('pemilihan_id', $pemilihan->id)
+                    ->withCount('suara')
+                    ->orderBy('nomor_urut')
+                    ->get()
+                    ->map(fn ($k) => [
+                        'nama_kandidat' => $k->nama_kandidat,
+                        'nomor_urut' => $k->nomor_urut,
+                        'suara_count' => $k->suara_count,
+                        'persentase' => $total === 0 ? 0 : round(($k->suara_count / $total) * 100, 2),
+                    ])->toArray(),
+                'total_suara' => $total,
+            ];
         }
 
-        // update data
         $this->allHasilData = $data;
-
-        // 🔥 trigger JS (animasi + chart refresh)
-        $this->dispatch('data-updated');
+        $this->lastSuaraCount = Suara::count();
     }
 
-    private function hitungStatistik($pemilihan)
+    public function refreshNow()
     {
-        $kandidatList = Kandidat::where('pemilihan_id', $pemilihan->id)
-            ->withCount('suara')
-            ->orderBy('nomor_urut', 'asc')
-            ->get()
-            ->map(function ($k) {
-                return [
-                    'nama_kandidat' => $k->nama_kandidat,
-                    'nomor_urut'    => $k->nomor_urut,
-                    'suara_count'   => $k->suara_count,
-                    'persentase'    => $k->persentaseSuara(),
-                ];
-            })
-            ->toArray();
-
-        return [
-            'pemilihan' => [
-                'nama_pemilihan' => $pemilihan->nama_pemilihan,
-            ],
-            'kandidat'    => $kandidatList,
-            'total_suara' => $pemilihan->totalSuara(),
-        ];
+        $this->reloadData();
+        $this->dispatch('manual-refresh');
     }
 
     public function getColor($nomorUrut)

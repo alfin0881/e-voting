@@ -40,12 +40,12 @@ class Kandidat extends Model
     // Hitung persentase suara
     public function persentaseSuara(): float
     {
-        $totalSuaraPemilihan = $this->pemilihan->totalSuara();
-        
-        if ($totalSuaraPemilihan === 0) {
+        $totalPemilihan = Suara::where('pemilihan_id', $this->pemilihan_id)->count();
+
+        if ($totalPemilihan === 0) {
             return 0;
         }
 
-        return round(($this->totalSuara() / $totalSuaraPemilihan) * 100, 2);
+        return round(($this->suara()->count() / $totalPemilihan) * 100, 2);
     }
 }

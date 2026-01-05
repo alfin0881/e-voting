@@ -29,13 +29,6 @@ class Pemilihan extends Model
         return $this->hasMany(Kandidat::class);
     }
 
-
-    public function suara(): HasMany
-    {
-        return $this->hasMany(Suara::class);
-    }
-
-
     public function peserta(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'peserta_pemilihan', 'pemilihan_id', 'user_id')
@@ -44,7 +37,7 @@ class Pemilihan extends Model
 
     public function totalSuara(): int
     {
-        return $this->suara()->count();
+        return Suara::where('pemilihan_id', $this->id)->count();
     }
 
     public function sedangAktif(): bool
