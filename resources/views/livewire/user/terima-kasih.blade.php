@@ -36,7 +36,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span>Terekam pada: {{ now()->timezone(value: 'Asia/Jakarta')->format(format: 'd M Y H:i') }} WIB</span>                </div>
+                    <span>Terekam pada: {{ now()->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB</span>                </div>
             </div>
 
             <div class="space-y-3 text-left">
@@ -63,7 +63,6 @@
             </div>
         </div>
 
-
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="{{ route('user.daftar-pemilihan') }}" 
@@ -77,7 +76,7 @@
 
         <!-- Footer Note -->
         <div class="mt-12 text-sm text-gray-500">
-            <p>Jika ada pertanyaan atau terjadi masalah, silahkan hubungi mas Admin (MalfinZ).</p>
+            <p>Jika ada pertanyaan atau terjadi masalah, silahkan hubungi panitia.</p>
         </div>
     </div>
 </div>

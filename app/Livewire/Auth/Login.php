@@ -53,15 +53,16 @@ class Login extends Component
 
         // LOGIN RESMI LARAVEL
         Auth::login($user, true);
-
         request()->session()->regenerate();
 
-        // REDIRECT SESUAI ROLE
+        session()->flash('success', 'Login berhasil. Selamat datang!');
+
         return redirect()->to(
             $user->role === 'admin'
                 ? route('admin.dashboard')
                 : route('user.daftar-pemilihan')
         );
+
     }
 
     public function logout()

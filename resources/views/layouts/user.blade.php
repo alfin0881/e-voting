@@ -56,7 +56,7 @@
     <!-- Footer -->
     <footer class="mt-16 py-8 bg-white/50 backdrop-blur-sm border-t border-gray-200">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-600 text-sm">© 2025 Kasya E-Voting. All rights reserved.</p>
+            <p class="text-gray-600 text-sm">© {{ date('Y')}} Kasya E-Voting. All rights reserved.</p>
         </div>
     </footer>
 

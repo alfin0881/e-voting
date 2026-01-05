@@ -61,7 +61,7 @@
                         <div class="flex items-center gap-4">
                             <div class="w-2 h-10 bg-emerald-500 rounded-full"></div>
                             <div>
-                                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Sudah Memilih</p>
+                                <p class="text-1xl font-bold text-emerald-600 mb-2">Sudah Memilih</p>
                                 <p class="text-xl font-black text-emerald-900 leading-none">{{ number_format($totalSiswaSudahMemilih) }} <span class="text-xs font-bold text-emerald-600/70">Siswa</span></p>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                         <div class="flex items-center gap-4">
                             <div class="w-2 h-10 bg-slate-300 rounded-full"></div>
                             <div>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Belum Memilih</p>
+                                <p class="text-1xl font-bold text-slate-400 mb-2">Belum Memilih</p>
                                 <p class="text-xl font-black text-slate-800 leading-none">{{ number_format(max(0, $totalUser - $totalSiswaSudahMemilih)) }} <span class="text-xs font-bold text-slate-400">Siswa</span></p>
                             </div>
                         </div>

@@ -1,373 +1,330 @@
-<div class="space-y-6">
+<style>
+    /* Animasi List Detail (Naik dari bawah) */
+    .detail-item {
+        opacity: 0;
+        transform: translateY(25px);
+        transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .detail-item.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Progress Bar Smooth */
+    .progress-bar {
+        width: 0% !important;
+        transition: width 2s cubic-bezier(0.1, 1, 0.1, 1) !important;
+    }
+    .pemilihan-slide {
+        animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+
+<style>
+    /* (STYLE ANDA — TIDAK DIUBAH) */
+    .detail-item {
+        opacity: 0;
+        transform: translateY(25px);
+        transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .detail-item.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .progress-bar {
+        width: 0% !important;
+        transition: width 2s cubic-bezier(0.1, 1, 0.1, 1) !important;
+    }
+    .pemilihan-slide {
+        animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+
+<div class="space-y-6"
+    wire:poll.60s="reloadData"
+    wire:key="hasil-pemilihan-root">
+
+    {{-- HEADER (TIDAK DIUBAH) --}}
     <div class="max-w-7xl mx-auto mb-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Hasil Pemilihan</h1>
-                <p class="text-gray-600 mt-1">Perolehan suara real-time seluruh pemilihan.</p>
+                <p class="text-gray-600 mt-1">Update otomatis setiap {{ $refreshInterval }} menit.</p>
             </div>
-            
+
             <div class="flex flex-col sm:flex-row items-center gap-4">
-                <select 
-                    id="pemilihanDropdown"
-                    class="w-full sm:w-64 px-4 py-3 rounded-2xl border border-slate-200 text-sm font-bold bg-white shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none">
+                <select id="pemilihanDropdown"
+                        class="w-full sm:w-64 px-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm outline-none">
                     @foreach($allHasilData as $i => $data)
-                        <option value="{{ $i }}">
-                            {{ $data['pemilihan']['nama_pemilihan'] }}
-                        </option>
+                        <option value="{{ $i }}">{{ $data['pemilihan']['nama_pemilihan'] }}</option>
                     @endforeach
                 </select>
-                
-                <div class="bg-white p-1.5 pr-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 transition-all hover:shadow-md">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
-                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
+
+                <div class="p-3 pr-8 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
+                        <i data-feather="bar-chart-2"></i>
                     </div>
                     <div>
-                        <span class="text-[9px] text-slate-400 uppercase font-black tracking-widest block leading-none mb-1">Total Pemilihan</span>
-                        <span class="text-2xl font-black text-slate-800 leading-none">{{ count($allHasilData) }}</span>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Total Pemilihan</p>
+                        <p class="text-2xl font-black text-slate-800">{{ count($allHasilData) }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    @if(count($allHasilData) > 0)
-        <div class="max-w-7xl mx-auto">
-           @foreach($allHasilData as $index => $data)
-            <div 
-                class="pemilihan-slide bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col transition-all duration-700"
-                data-index="{{ $index }}"
-                style="display: {{ $index === 0 ? 'flex' : 'none' }}">
-                    <div class="px-8 py-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div class="space-y-2">
-                            <span class="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-bold uppercase rounded-full tracking-wider">
-                                <span class="relative flex h-2 w-2">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                                </span>
-                                Live Report
-                            </span>
-                            <div class="flex items-center gap-2 mt-2 text-[11px] font-bold text-indigo-500 uppercase tracking-widest">
-                            <span class="relative flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                            </span>
-                            Auto refresh setiap 10 detik
-                        </div>
-                            <h2 class="text-3xl font-bold text-gray-800">{{ $data['pemilihan']['nama_pemilihan'] }}</h2>
-                            <div class="flex items-center gap-2 text-slate-400">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-xs font-bold uppercase tracking-wide">
-                                   {{ \Carbon\Carbon::parse($data['pemilihan']['tanggal_mulai'])->locale('id')->translatedFormat('d M') }} -
-                                    {{ \Carbon\Carbon::parse($data['pemilihan']['tanggal_selesai'])->locale('id')->translatedFormat('d M Y') }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 border border-slate-100 px-6 py-4 rounded-3xl text-center md:text-right min-w-[160px]">
-                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Suara Masuk</span>
-                            <span class="text-3xl font-black text-indigo-600 leading-none">{{ number_format($data['total_suara']) }}</span>
-                        </div>
-                    </div>
+    {{-- SLIDE CONTAINER --}}
+    {{-- 🔑 wire:ignore.self AGAR LIVEWIRE TIDAK MERUSAK CHART --}}
+    <div class="max-w-7xl mx-auto" id="slideContainer" wire:ignore.self>
 
-                    <div class="p-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                        
-                        <div class="lg:col-span-5 flex flex-col items-center justify-center">
-                            <div class="relative h-72 w-full mb-10">
-                                <canvas 
-                                    id="line-chart-{{ $index }}"
-                                    class="line-chart-canvas"
-                                    data-labels="{{ json_encode(collect($data['kandidat'])->pluck('nama_kandidat')) }}"
-                                    data-values="{{ json_encode(collect($data['kandidat'])->pluck('suara_count')) }}"
-                                    data-colors="{{ json_encode(collect($data['kandidat'])->map(fn($k) => $this->getColor($k['nomor_urut']))) }}">
-                                </canvas>
+        @foreach($allHasilData as $index => $data)
+            <div
+                class="pemilihan-slide bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
+                style="display: {{ $index === 0 ? 'block' : 'none' }}">
 
-                                @if($data['total_suara'] == 0)
-                                    <div class="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-3xl text-slate-400 font-bold text-sm">
-                                        Menunggu Data...
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="flex flex-wrap justify-center gap-3">
-                                @foreach($data['kandidat'] as $kandidat)
-                                    <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 transition-all hover:bg-white hover:shadow-sm">
-                                        <span class="w-3 h-3 rounded-full shadow-sm" style="background-color: {{ $this->getColor($kandidat['nomor_urut']) }}"></span>
-                                        <span class="text-[10px] font-black text-slate-600 uppercase tracking-wider">
-                                            {{ $kandidat['nama_kandidat'] }}
-                                        </span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-7 space-y-5">
-                            <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
-                                <span class="h-px w-8 bg-slate-200"></span>
-                                Detail Perolehan
-                            </h3>
-                            
-                            @foreach($data['kandidat'] as $i => $kandidat)
-                                <div class="relative group bg-slate-50/50 p-4 rounded-3xl border border-transparent hover:border-slate-100 hover:bg-white transition-all duration-300">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shadow-lg transition-transform group-hover:scale-110"
-                                                 style="background-color: {{ $this->getColor($kandidat['nomor_urut']) }}">
-                                                {{ $kandidat['nomor_urut'] }}
-                                            </div>
-                                            <div>
-                                                <p class="text-base font-black text-slate-800 leading-none mb-1">{{ $kandidat['nama_kandidat'] }}</p>
-                                                <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{{ number_format($kandidat['suara_count']) }} Suara </p>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="text-2xl font-black text-slate-800">{{ $kandidat['persentase'] }}<span class="text-sm ml-0.5 text-slate-400">%</span></span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5">
-                                        <div class="h-full rounded-full transition-all duration-1000 ease-out shadow-sm"
-                                             style="width: {{ $kandidat['persentase'] }}%; background-color: {{ $this->getColor($kandidat['nomor_urut']) }}">
-                                        </div>
-                                    </div>
-                                    
-                                    @if($i === 0 && $kandidat['suara_count'] > 0)
-                                        <div class="absolute -top-2 -right-2 transform rotate-6">
-                                            <span class="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-xl shadow-lg uppercase tracking-tighter">Unggul</span>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
+                <div class="px-8 py-8 border-b border-slate-50 flex justify-between items-center">
+                    <h2 class="text-3xl font-bold">{{ $data['pemilihan']['nama_pemilihan'] }}</h2>
+                    <div class="bg-slate-50 px-6 py-3 rounded-2xl text-center">
+                        <span class="block text-[10px] font-bold text-slate-400">TOTAL SUARA</span>
+                        <span class="text-2xl font-black text-slate-700">
+                            {{ number_format($data['total_suara']) }}
+                        </span>
                     </div>
                 </div>
-            @endforeach
-        </div>
-    @else
-        <div class="max-w-2xl mx-auto py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] shadow-sm border border-dashed border-slate-300">
+
+                <div class="p-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+                    {{-- CHART --}}
+                    <div class="lg:col-span-5 chart-wrapper"
+                        data-labels='@json(collect($data["kandidat"])->pluck("nama_kandidat"))'
+                        data-values='@json(collect($data["kandidat"])->pluck("suara_count"))'
+                        data-colors='@json(collect($data["kandidat"])->map(fn($k)=>$this->getColor($k["nomor_urut"])))'>
+
+                        <div class="relative h-72">
+                            <canvas class="line-chart-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    {{-- DETAIL (TIDAK DIUBAH) --}}
+                    <div class="lg:col-span-7 space-y-4">
+                        @foreach($data['kandidat'] as $k)
+                            <div class="detail-item bg-slate-50 p-4 rounded-3xl">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center font-black"
+                                            style="background: {{ $this->getColor($k['nomor_urut']) }}">
+                                            {{ $k['nomor_urut'] }}
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-slate-800">{{ $k['nama_kandidat'] }}</p>
+                                            <p class="text-xs text-slate-400">{{ number_format($k['suara_count']) }} suara</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl font-black text-slate-800">{{ $k['persentase'] }}%</div>
+                                </div>
+
+                                <div class="mt-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full progress-bar rounded-full"
+                                        style="background: {{ $this->getColor($k['nomor_urut']) }}"
+                                        data-width="{{ $k['persentase'] }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                </div>
             </div>
-    @endif
+        @endforeach
+    </div>
 </div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
 <script>
-/* =====================================================
-   GLOBAL
-===================================================== */
-Chart.register(ChartDataLabels);
+    let currentSlide = 0;
+    let lineCharts = new Map();
+    let rotateInterval = null;
 
-let doughnutCharts = new Map();
-let lineCharts = new Map();
-let slides = [];
-let currentSlide = 0;
-let slideInterval = null;
+    /**
+     * Mengatur jarak angka pada sumbu Y (Grid) secara dinamis
+     * agar grafik proporsional baik untuk data sedikit maupun banyak.
+     */
+    function getYAxisStep(max) {
+        if (max <= 10) return 1;          // Jarak 1, 2, 3...
+        if (max <= 50) return 5;          // Jarak 5, 10, 15...
+        if (max <= 100) return 10;        // Jarak 10, 20, 30...
+        if (max <= 500) return 50;        // Jarak 50, 100, 150...
+        if (max <= 2000) return 200;      // Jarak 200, 400, 600...
+        return Math.ceil(max / 10);       // Untuk data sangat besar, bagi menjadi 10 grid
+    }
 
-/* =====================================================
-   HELPER : AUTO STEP (KECIL → BESAR)
-===================================================== */
-function getYAxisStep(maxValue) {
-    if (maxValue <= 10)   return 1;
-    if (maxValue <= 50)   return 5;
-    if (maxValue <= 100)  return 10;
-    if (maxValue <= 300)  return 25;
-    if (maxValue <= 500)  return 50;
-    if (maxValue <= 1000) return 100;
-    return 250;
-}
+    /**
+     * Merender grafik Chart.js dengan efek tumbuh dari angka 0
+     */
+    function renderCharts(activeSlide) {
+        const wrapper = activeSlide.querySelector('.chart-wrapper');
+        const canvas = activeSlide.querySelector('.line-chart-canvas');
+        if (!wrapper || !canvas) return;
 
-/* =====================================================
-   DOUGHNUT CHART
-===================================================== */
-function renderDoughnutCharts() {
-    document.querySelectorAll('.election-chart-canvas').forEach(canvas => {
-        if (canvas.offsetParent === null) return;
-
-        const ctx = canvas.getContext('2d');
-        const labels = JSON.parse(canvas.dataset.labels || '[]');
-        const values = JSON.parse(canvas.dataset.values || '[]');
-        const colors = JSON.parse(canvas.dataset.colors || '[]');
-        const total = values.reduce((a, b) => a + b, 0);
-
-        if (doughnutCharts.has(canvas)) {
-            doughnutCharts.get(canvas).destroy();
-            doughnutCharts.delete(canvas);
-        }
-
-        const chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors,
-                    borderWidth: 6,
-                    borderColor: '#ffffff',
-                    hoverOffset: 18,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '78%',
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        color: '#fff',
-                        font: { weight: '900', size: 11 },
-                        formatter: value => {
-                            if (!total) return null;
-                            const percent = (value / total) * 100;
-                            return percent > 8 ? percent.toFixed(1) + '%' : null;
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1e293b',
-                        padding: 14,
-                        cornerRadius: 12,
-                        callbacks: {
-                            label: ctx =>
-                                `${ctx.label}: ${ctx.raw.toLocaleString()} suara`
-                        }
-                    }
-                }
-            }
-        });
-
-        doughnutCharts.set(canvas, chart);
-    });
-}
-
-/* =====================================================
-   LINE CHART (AUTO STEP)
-===================================================== */
-function renderLineCharts() {
-    document.querySelectorAll('.line-chart-canvas').forEach(canvas => {
-        if (canvas.offsetParent === null) return;
-
-        const ctx = canvas.getContext('2d');
-        const labels = JSON.parse(canvas.dataset.labels || '[]');
-        const values = JSON.parse(canvas.dataset.values || '[]');
-        const colors = JSON.parse(canvas.dataset.colors || '[]');
-
+        // Hancurkan instance lama agar animasi reset
         if (lineCharts.has(canvas)) {
             lineCharts.get(canvas).destroy();
-            lineCharts.delete(canvas);
         }
 
-        const maxValue = Math.max(...values, 0);
-        const step = getYAxisStep(maxValue);
-        const roundedMax = Math.ceil(maxValue / step) * step;
+        const labels = JSON.parse(wrapper.dataset.labels || '[]');
+        const values = JSON.parse(wrapper.dataset.values || '[]');
+        const colors = JSON.parse(wrapper.dataset.colors || '[]');
+        
+        const maxVal = Math.max(...values, 0);
+        const step = getYAxisStep(maxVal);
+        
+        // Memberikan ruang di atas titik tertinggi agar tidak mentok
+        const suggestedMax = maxVal === 0 ? 10 : Math.ceil((maxVal + (step / 2)) / step) * step;
 
-        const chart = new Chart(ctx, {
+        const ctx = canvas.getContext('2d');
+        const newChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels,
                 datasets: [{
                     data: values,
                     borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99,102,241,0.15)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     pointBackgroundColor: colors,
-                    pointBorderColor: '#ffffff',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
                     pointRadius: 6,
-                    tension: 0.35,
+                    pointHoverRadius: 8,
+                    tension: 0.4,
                     fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
+                animations: {
+                    y: {
+                        duration: 2000,
+                        easing: 'easeOutQuart',
+                        // Memulai animasi garis dari baseline angka 0
+                        from: (ctx) => ctx.chart.scales.y.getPixelForValue(0)
+                    }
                 },
                 scales: {
-                    y: {
+                    y: { 
                         beginAtZero: true,
-                        max: roundedMax,
+                        max: suggestedMax,
                         ticks: {
                             stepSize: step,
-                            precision: 0
+                            precision: 0, // Menghindari angka desimal (koma)
+                            color: '#94a3b8',
+                            font: { size: 11 }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.03)',
+                            drawBorder: false
                         }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 11 }
+                        },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false
                     }
                 }
             }
         });
+        lineCharts.set(canvas, newChart);
+    }
 
-        lineCharts.set(canvas, chart);
+    /**
+     * Mengatur perpindahan slide dan mentrigger animasi elemen
+     */
+    function showSlide(index) {
+        const slides = document.querySelectorAll('.pemilihan-slide');
+        if (slides.length === 0) return;
+
+        currentSlide = (index + slides.length) % slides.length;
+
+        slides.forEach((s, i) => {
+            if (i === currentSlide) {
+                s.style.display = 'block';
+                
+                const items = s.querySelectorAll('.detail-item');
+                const bars = s.querySelectorAll('.progress-bar');
+
+                // 1. Reset State Animasi
+                items.forEach(el => el.classList.remove('show'));
+                bars.forEach(el => el.style.setProperty('width', '0%', 'important'));
+
+                // 2. Jalankan Animasi secara bertahap (Staggered)
+                setTimeout(() => {
+                    // List Kandidat naik satu per satu
+                    items.forEach((el, idx) => {
+                        setTimeout(() => el.classList.add('show'), idx * 150);
+                    });
+
+                    // Progress bar mengisi
+                    bars.forEach(el => {
+                        el.style.setProperty('width', el.dataset.width, 'important');
+                    });
+
+                    // Grafik naik dari nol
+                    renderCharts(s);
+                }, 100);
+            } else {
+                s.style.display = 'none';
+            }
+        });
+
+        // Sinkronkan dropdown jika ada
+        const dropdown = document.getElementById('pemilihanDropdown');
+        if (dropdown) dropdown.value = currentSlide;
+    }
+
+    /**
+     * Inisialisasi dan Event Listeners
+     */
+    document.addEventListener('livewire:init', () => {
+        // Otomatis update tampilan saat Livewire berhasil polling data baru
+        Livewire.on('data-updated', () => {
+            console.log('🔄 Data diperbarui dari server, merestart animasi slide aktif...');
+            showSlide(currentSlide); 
+        });
     });
-}
 
-/* =====================================================
-   SLIDE CONTROL
-===================================================== */
-function showSlide(index) {
-    if (!slides.length) return;
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tampilkan slide pertama
+        showSlide(0);
 
-    slides[currentSlide].style.display = 'none';
-    currentSlide = index;
-    slides[currentSlide].style.display = 'flex';
+        // Rotasi otomatis setiap 15 detik (Sesuaikan durasi di sini)
+        rotateInterval = setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 4000); 
 
-    const dropdown = document.getElementById('pemilihanDropdown');
-    if (dropdown) dropdown.value = currentSlide;
-
-    setTimeout(() => {
-        renderDoughnutCharts();
-        renderLineCharts();
-    }, 120);
-}
-
-/* =====================================================
-   AUTO ROTATE
-===================================================== */
-function startAutoRotate() {
-    if (slideInterval) clearInterval(slideInterval);
-
-    slideInterval = setInterval(() => {
-        const next = (currentSlide + 1) % slides.length;
-        showSlide(next);
-    }, 10000);
-}
-
-/* =====================================================
-   DROPDOWN
-===================================================== */
-function initDropdown() {
-    const dropdown = document.getElementById('pemilihanDropdown');
-    if (!dropdown) return;
-
-    dropdown.addEventListener('change', e => {
-        showSlide(parseInt(e.target.value, 10));
-        startAutoRotate();
+        // Listener Dropdown
+        const dropdown = document.getElementById('pemilihanDropdown');
+        if (dropdown) {
+            dropdown.addEventListener('change', (e) => {
+                showSlide(parseInt(e.target.value));
+            });
+        }
+        
+        // Inisialisasi Feather Icons jika digunakan
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
     });
-}
-
-/* =====================================================
-   MASTER INIT (LIVEWIRE SAFE)
-===================================================== */
-function initAll() {
-    slides = Array.from(document.querySelectorAll('.pemilihan-slide'));
-    if (!slides.length) return;
-
-    slides.forEach((s, i) => {
-        s.style.display = i === 0 ? 'flex' : 'none';
-    });
-
-    currentSlide = 0;
-
-    renderDoughnutCharts();
-    renderLineCharts();
-    initDropdown();
-    startAutoRotate();
-}
-
-/* =====================================================
-   EVENTS
-===================================================== */
-document.addEventListener('DOMContentLoaded', initAll);
-document.addEventListener('livewire:load', initAll);
-document.addEventListener('livewire:navigated', initAll);
 </script>

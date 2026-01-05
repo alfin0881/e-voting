@@ -122,7 +122,7 @@
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Pemilihan</h3>
             <p class="text-gray-500">Saat ini tidak ada pemilihan yang aktif untuk Anda.</p>
-            <p class="text-gray-400 text-sm mt-2">Silahkan hubungi mas Admin (MalfinZ).</p>
+            <p class="text-gray-400 text-sm mt-2">Silahkan hubungi panitia.</p>
         </div>
     @endif
 </div>

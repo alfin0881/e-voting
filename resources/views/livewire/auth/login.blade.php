@@ -71,7 +71,7 @@
 
         {{-- Footer --}}
         <p class="text-center text-gray-500 text-sm mt-8">
-            © 2025 Kasya E-Voting. All rights reserved.
+            © {{ date('Y') }} Kasya E-Voting. All rights reserved.
         </p>
     </div>
 </div>

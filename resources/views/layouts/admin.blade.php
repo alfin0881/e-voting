@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50"wire:navigate.ignore>
 
 <div class="flex min-h-screen">
 
@@ -86,7 +86,6 @@
     ☰
 </button>
 
-
     <!-- MAIN -->
     <main id="mainContent"
           class="flex-1 ml-64 p-8 transition-all duration-300 ease-in-out">
@@ -96,8 +95,6 @@
     </main>
 
 </div>
-
-@livewireScripts
 
 <script>
     feather.replace();
@@ -161,8 +158,12 @@
     });
 </script>
 
-
-
+@livewireScripts
+<script>
+document.addEventListener('livewire:init', () => {
+    console.log('✅ Livewire INIT - polling siap');
+});
+</script>
 
 </body>
 </html>
