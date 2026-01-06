@@ -66,7 +66,7 @@ class HasilPemilihan extends Component
     {
         return [
             '01' => '#0c4780ff',
-            '02' => '#e3b612ff',
+            '02' => '#dbad09ff',
             '03' => '#f63b3eff',
             '04' => '#10B981',
             '05' => '#8B5CF6',
