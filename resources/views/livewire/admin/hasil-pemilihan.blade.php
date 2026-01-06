@@ -115,7 +115,7 @@
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/highcharts-3d.js"></script>
 <script>
-    const ROTATE_INTERVAL = 10000;
+    const ROTATE_INTERVAL = 5000;
     const BROWSER_REFRESH_INTERVAL = 300000;
     let currentSlide = 0;
     let rotateTimer = null;
