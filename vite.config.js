@@ -11,14 +11,14 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        host:'0.0.0.0',
-        port:5173,
-        strictPort:true,
-        hmr:{
-            host:'192.168.1.7',
-            protocol:'http',
-            port:5173,
-        },
+        // host:'0.0.0.0',
+        // port:5173,
+        // strictPort:true,
+        // hmr:{
+        //     host:'192.168.1.7',
+        //     protocol:'http',
+        //     port:5173,
+        // },
 
 
         watch: {

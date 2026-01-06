@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'nama' => 'Admin E-voting',
+            'nama' => 'Admin',
             'nis' => 'admin',
             'kelas' => null,
             'password' => Hash::make('123'),
